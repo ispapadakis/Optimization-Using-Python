@@ -3,7 +3,6 @@
 # title: "Credit Limit Optimization Model"
 # author: "Yanni Papadakis"
 # ---
-# Reimplementing R - lpSolveAPI Based - Model
 
 
 # Import PuLP modeler functions
