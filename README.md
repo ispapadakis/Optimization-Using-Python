@@ -1,5 +1,5 @@
 # Optimization-Using-Python
 
-- Implementation of Optimization Model Using Python/Pulp
+- [Implementation of Optimization Model Using Python/Pulp](CredLimOptimization.py)
 
-- Example of Nonlinear Optimization Using scipy.optimize
+- [Example of Nonlinear Optimization Using scipy.optimize]()
