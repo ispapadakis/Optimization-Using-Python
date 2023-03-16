@@ -5,5 +5,6 @@
 - [Example of Nonlinear Optimization Using scipy.optimize](NonlinearProgrammingUsingPython.ipynb)
 
 - [Job Shop Scheduling Using Google ortools](SimpleJobShopScheduling.ipynb)
-
-Example Output: ![opt_sched](jobshopexample.png)
+  |  Example Output |
+  |  -------------- |
+  |  <img src="jobshopexample.png" width="700"> |
