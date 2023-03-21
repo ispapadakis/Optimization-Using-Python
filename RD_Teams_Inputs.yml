@@ -1,0 +1,72 @@
+resources:
+    Generative:
+        member: ["G1","G2","G3","G4","G5"]
+        task: ["Design_Exp","Soln_Pass_A","Eval_Pass_A","Soln_Pass_B","Eval_Pass_B","Soln_Pass_C","Eval_Pass_C"]
+    Planner:
+        member: ["P1","P2"]
+        task: ["Plan_Project","Design_Exp","Documentation_to_Client"]
+    Clinical:
+        member: ["C1","C2","C3"]
+        task: ["Clinical_Study_Design","Clinical_Study_Execution","Clinical_Study_Report"]
+project_type:
+    full_length:
+     - Plan_Project
+     - Design_Exp
+     - Soln_Pass_A
+     - Eval_Pass_A
+     - Soln_Pass_B
+     - Eval_Pass_B
+     - Soln_Pass_C
+     - Eval_Pass_C
+     - Clinical_Study_Design
+     - Clinical_Study_Execution
+     - Clinical_Study_Report
+     - Documentation_to_Client
+    two_phase:
+     - Plan_Project
+     - Design_Exp
+     - Soln_Pass_A
+     - Eval_Pass_A
+     - Soln_Pass_B
+     - Eval_Pass_B
+     - Clinical_Study_Design
+     - Clinical_Study_Execution
+     - Documentation_to_Client
+    quick_analysis:
+     - Plan_Project
+     - Design_Exp
+     - Soln_Pass_A
+     - Eval_Pass_A
+     - Clinical_Study_Design
+     - Clinical_Study_Execution
+     - Clinical_Study_Report
+projects:
+    longasap:
+        type: full_length
+        durations: [2,2,8,1,4,1,3,1,1,8,1,3]
+        deadline: 33
+        delay_penalty: 4
+        early_bonus: 1
+    long:
+        type: full_length
+        durations: [2,2,8,1,4,1,3,1,1,8,1,3]
+        deadline: 40
+        delay_penalty: 3
+        early_bonus: 1
+    regsize:
+        type: two_phase
+        durations: [2,2,8,1,4,1,1,6,3]
+        deadline: 45
+        delay_penalty: 2
+        early_bonus: 0
+    short:
+        type: quick_analysis
+        durations: [2,2,12,1,1,8,1]
+        deadline: 50
+        delay_penalty: 2
+        early_bonus: 0
+resource_occupied:
+# [(start, end, units_occupied), (...)]
+    Clinical: [[0,6,3],[6,12,1]]
+    Planner: [[0,4,1]]
+    Generative: [[0,5,4],[5,18,2]]
