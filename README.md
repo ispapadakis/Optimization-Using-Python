@@ -1,10 +1,10 @@
 # Optimization-Using-Python
 
-- [Implementation of Optimization Model Using Python/Pulp](CredLimOptimization.py)
+- [Early Work: Implementation of Optimization Model Using Python/Pulp](CredLimOptimization.py)
 
-- [Example of Nonlinear Optimization Using scipy.optimize](NonlinearProgrammingUsingPython.ipynb)
+- [Early Work: Example of Nonlinear Optimization Using scipy.optimize](NonlinearProgrammingUsingPython.ipynb)
 
-- [Job Shop Scheduling Using Google ortools](SimpleJobShopScheduling.ipynb)
+- [Job Shop Scheduling Using Constraint Programming  With Google ortools](SimpleJobShopScheduling.ipynb)
   |  Example Output |
   |  -------------- |
   |  <img src="jobshopexample.png" width="700"> |
