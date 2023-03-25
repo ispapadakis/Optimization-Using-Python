@@ -66,13 +66,13 @@ projects:
         durations: [2,2,8,1,4,1,1,6,3]
         deadline: 45
         delay_penalty: 2
-        early_bonus: 0
+        early_bonus: 0.5
     short:
         type: quick_analysis
         durations: [2,2,12,1,1,8,1]
         deadline: 50
         delay_penalty: 2
-        early_bonus: 0
+        early_bonus: 0.1
 resource_occupied:
 # [(start, end, units_occupied), (...)]
     Clinical: [[0,6,3],[6,12,1]]

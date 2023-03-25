@@ -4,34 +4,20 @@ import yaml
 import sys
 from typing import TextIO
 import pandas as pd
+import numpy as np
 
 # Plot Resource Utilization Diagram
-def plot_utilization_new(resource_reqs: dict, datetime_0: datetime, tmax: int):
+def plot_utilization(resource_reqs: dict, datetime_0: datetime, tmax: int):
     fig, ax = plt.subplots(len(resource_reqs), 1, figsize=(6,10), sharex=True)
     fig.autofmt_xdate(rotation=90)
     for j, resource in enumerate(resource_reqs.keys()):
         y = resource_reqs[resource]
+        y = y + [y[-1]]
         x = [datetime_0 + timedelta(days=t) for t in range(len(y))]
-        ax[j].step(x, y, where="pre");
-        ax[j].fill_between(x, y, step="pre", alpha=0.4)
+        ax[j].step(x, y, where="post");
+        ax[j].fill_between(x, y, step="post", alpha=0.4)
         ax[j].grid()
         ax[j].set_title("Utilization of {}".format(resource))
-    return fig
-
-# Plot Resource Utilization Diagram
-def plot_utilization(resource_reqs: dict, datetime_0: datetime, tmax: int = 10):
-    fig, ax = plt.subplots(len(resource_reqs), 1, figsize=(6,10), sharex=True)
-    fig.autofmt_xdate(rotation=90)
-    for j, resource in enumerate(resource_reqs):
-        y = [0 for _ in range(tmax)]
-        for start, end, utilization in resource_reqs[resource]:
-            for i in range(start,end):
-                y[i+1] += utilization
-        x = [datetime_0 + timedelta(days=t) for t in range(len(y))]
-        ax[j].step(x, y, where="pre");
-        ax[j].fill_between(x, y, step="pre", alpha=0.4)
-        ax[j].grid()
-        ax[j].set_title("Utilization of Resource {}".format(resource))
     return fig
 
 # Display Project Tasks
@@ -71,7 +57,7 @@ def read_resource_input(
 
     # Plot Initial Requirements Per Resource
     res_reqs = {res:rstruct.state0 for res, rstruct in out.items()}
-    fig = plot_utilization_new(res_reqs, datetime_0, tmax)
+    fig = plot_utilization(res_reqs, datetime_0, tmax)
     fig.suptitle("Unavailable Resources", fontweight ="bold")
     plt.savefig(plotfile)
     if show_utilization_plot:

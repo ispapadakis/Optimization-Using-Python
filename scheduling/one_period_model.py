@@ -106,7 +106,7 @@ class Model(object):
 
     def set_resource_constraints(self):
         # Enforce At Least One Resource Per Task
-        for tcase, idlist in self.resolve_multiple_res.items():
+        for _, idlist in self.resolve_multiple_res.items():
             self.model.AddBoolXOr(*idlist)
         # Disjunctive Constraint: Enforce Resource Capacity Limit Over All Intervals
         for res in self.resources.values():
@@ -184,6 +184,9 @@ if __name__ == "__main__":
     mod.collect_results()
     mod.project_report()
 
-    print(pd.DataFrame(mod.tograph))
+    for pname, task in mod.resolve_multiple_res:
+        print(pname, task, [mod.solver.Value(dv) for dv in mod.resolve_multiple_res[pname, task]])
+        print(pname, task, mod.task_resource_options[task])
+
 
 
