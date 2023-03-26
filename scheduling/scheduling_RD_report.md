@@ -35,4 +35,28 @@
 
 
 ### Resource Utilization At Time 0
-![Resource Prior Utilization](scheduling/scheduling_RD_resource_prior_utilization.png 'Title')
+![Resource Prior Utilization](scheduling/scheduling_RD_resource_prior_utilization.png)
+# Optimization Results
+
+
+
+- Solution Status: OPTIMAL
+	- Optimal Objective Value: 7.300
+	- Optimal Objective Bound: 7.300
+
+
+
+
+### Project Completion Report
+| Project    | Completion |  Early |  Tardy |
+| :------    | ---------: |  ----: |  ----: |
+| longasap   |         37 |      0 |      4 |
+| long       |         39 |      1 |      0 |
+| regsize    |         32 |     13 |      0 |
+| short      |         38 |     12 |      0 |
+
+## Optimal Timetable
+![Timetable](scheduling/scheduling_RD_timetable.png)
+
+
+

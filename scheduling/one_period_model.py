@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from collections import namedtuple
 import sys
 import plotly.express as px
+import plotly.io as pio
 import pandas as pd
 
 
@@ -51,7 +52,7 @@ class Model(object):
         
         print("\n"*3, file=repfile)
         print("### Resource Utilization At Time 0", file=repfile)
-        print("![Resource Prior Utilization]({} 'Title')".format(rpu_image_file), file=repfile)
+        print("![Resource Prior Utilization]({})".format(rpu_image_file), file=repfile)
         repfile.close()
 
     def set_model_variables(self):
@@ -72,20 +73,19 @@ class Model(object):
                 dv_start = self.model.NewIntVar(0, self.horizon, prefix + 'start')
                 dv_end = self.model.NewIntVar(0, self.horizon, prefix + 'end')
                 self.task_times[pname].append(TaskWindow(dv_start, dv_end))
-                self.task_resource_assign[pname][task] = {}
                 res_options = self.task_resource_options[task]
                 if len(res_options) == 1:
                     resource = res_options[0]
                     ivname = "{}_{}_interval".format(prefix, resource)
                     dv_interval = self.model.NewIntervalVar(dv_start, duration, dv_end, ivname)
-                    self.task_resource_assign[pname][task][resource] = dv_interval
+                    self.task_resource_assign[pname].setdefault(task,[]).append(dv_interval)
                     self.resource_needs.setdefault(resource,[]).append((dv_interval, self.resource_units_per_task))
                 else:
                     for resource in res_options:
                         resprefix = "{}{}_".format(prefix, resource)
                         dv_select = self.model.NewBoolVar(resprefix+"indicator")
                         dv_interval = self.model.NewOptionalIntervalVar(dv_start, duration, dv_end, dv_select, resprefix+"opt_interval")
-                        self.task_resource_assign[pname][task][resource] = dv_interval
+                        self.task_resource_assign[pname].setdefault(task,[]).append(dv_interval)
                         self.resolve_multiple_res.setdefault((pname,task),[]).append(dv_select)
                         self.resource_needs.setdefault(resource,[]).append((dv_interval, self.resource_units_per_task))
         for res in self.resources.values():
@@ -143,37 +143,71 @@ class Model(object):
         print("Solver Wall Time {:,.4f} secs".format(self.solver.WallTime()))
 
     def collect_results(self):
+        out = "\n"*3
         if self.status == cp_model.OPTIMAL or self.status == cp_model.FEASIBLE:
-            print('Solution Status:', self.solver.StatusName())
-            self.tograph = []
+            out += '- Solution Status: {}\n'.format(self.solver.StatusName())
+            self.__tograph__ = []
             for pname in self.task_resource_assign:
                 for task in self.task_resource_assign[pname]:
-                    for resource, iv in self.task_resource_assign[pname][task].items():
+                    for j, iv in enumerate(self.task_resource_assign[pname][task]):
+                        resource = self.task_resource_options[task][j]
+                        if (pname, task) in self.resolve_multiple_res:
+                            is_active = bool(self.solver.Value(self.resolve_multiple_res[pname,task][j]))
+                        else:
+                            is_active = True
                         start = self.solver.Value(iv.StartExpr())
                         end = self.solver.Value(iv.EndExpr())
-                        self.tograph.append({'Project': pname})
-                        self.tograph[-1]["Resource"] = resource
-                        self.tograph[-1]["Task"] = task
-                        self.tograph[-1]["Start"] = self.datetime_0 + timedelta(days=start)
-                        self.tograph[-1]["Finish"] = self.datetime_0 + timedelta(days=end)
+                        self.__tograph__.append({'Project': pname})
+                        self.__tograph__[-1]["Resource"] = resource
+                        self.__tograph__[-1]["Task"] = task
+                        self.__tograph__[-1]["Start"] = self.datetime_0 + timedelta(days=start)
+                        self.__tograph__[-1]["Finish"] = self.datetime_0 + timedelta(days=end)
+                        self.__tograph__[-1]["Is_Active"] = is_active
 
-            print(f'Optimal Objective Value: {self.solver.ObjectiveValue()}')
-            print(f'Optimal Objective Bound: {self.solver.BestObjectiveBound()}')
+            df = pd.DataFrame(self.__tograph__)
+            fig = px.timeline(
+                df.loc[df["Is_Active"],:], 
+                x_start="Start", 
+                x_end="Finish", 
+                y="Project", 
+                color="Task",
+                pattern_shape="Resource",
+                pattern_shape_sequence=["x", "", "+"],
+                color_discrete_sequence=px.colors.qualitative.Light24
+            )
+            fig.update_yaxes(categoryorder="category descending")
+            pio.write_image(fig, "scheduling/{}_timetable.png".format(self.name), width=1080, height=720)
+
+            out += '\t- Optimal Objective Value: {:,.3f}\n'.format(self.solver.ObjectiveValue())
+            out += '\t- Optimal Objective Bound: {:,.3f}\n'.format(self.solver.BestObjectiveBound())
         else:
-            print('No solution found.')
+            out += '- No solution found.\n'
+        
+        return out
 
-    def project_report(self, file=sys.stdout):
-        print("\n"*3, file=file)
-        print("### Project Completion Report", file=file)
-        fmt = "| {:10} | {:>10} | {:>6} | {:>6} |"
-        print(fmt.format("Project", "Completion", "Early", "Tardy"), file=file)
-        print(fmt.format(":------", "---------:", "----:", "----:"), file=file)
+    def project_report(self):
+        out = "\n"*3
+        out += "### Project Completion Report\n"
+        fmt = "| {:10} | {:>10} | {:>6} | {:>6} |\n"
+        out += fmt.format("Project", "Completion", "Early", "Tardy")
+        out += fmt.format(":------", "---------:", "----:", "----:")
         self.makespan = 0
         for pname in self.projects:
             proj_end = self.solver.Value(self.get_project_endtime(pname))
             earliness, tardiness = self.project_completion[pname]
             self.makespan = max(self.makespan, proj_end)
-            print(fmt.format(pname, proj_end, self.solver.Value(earliness), self.solver.Value(tardiness)), file=file)
+            out += fmt.format(pname, proj_end, self.solver.Value(earliness), self.solver.Value(tardiness))
+        return out
+    
+    def report_results(self):
+        repfile = open(self.report_file, "a")
+        print("# Optimization Results", file=repfile)
+        print(self.collect_results() , file=repfile)
+        print(self.project_report() , file=repfile)
+        print("## Optimal Timetable" , file=repfile)
+        timetable_file = "scheduling/{}_timetable.png".format(self.name)
+        print("![Timetable]({})\n\n\n".format(timetable_file) , file=repfile)
+        repfile.close()
 
 
 if __name__ == "__main__":
@@ -181,12 +215,7 @@ if __name__ == "__main__":
     mod.get_inputs(model_input_file='scheduling/RD_Teams_Inputs.yml', date0_str="2023-04-01")
     mod.build_model()
     mod.solve()
-    mod.collect_results()
-    mod.project_report()
-
-    for pname, task in mod.resolve_multiple_res:
-        print(pname, task, [mod.solver.Value(dv) for dv in mod.resolve_multiple_res[pname, task]])
-        print(pname, task, mod.task_resource_options[task])
+    mod.report_results()
 
 
 
