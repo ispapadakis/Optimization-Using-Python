@@ -35,7 +35,7 @@
 
 
 ### Resource Utilization At Time 0
-![Resource Prior Utilization](scheduling/scheduling_RD_resource_prior_utilization.png)
+![Resource Prior Utilization](scheduling_RD_resource_prior_utilization.png)
 # Optimization Results
 
 
@@ -56,7 +56,7 @@
 | short      |         38 |     12 |      0 |
 
 ## Optimal Timetable
-![Timetable](scheduling/scheduling_RD_timetable.png)
+![Timetable](scheduling_RD_timetable.png)
 
 
 

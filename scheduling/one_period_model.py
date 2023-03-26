@@ -22,7 +22,7 @@ class Model(object):
         self.report_file = "scheduling/{}_report.md".format(name)
 
     def get_inputs(self, model_input_file: str, date0_str: str):
-        rpu_image_file = "scheduling/{}_resource_prior_utilization.png".format(self.name)
+        rpu_image_file = "{}_resource_prior_utilization.png".format(self.name)
         # Import Model Inputs
         with open(model_input_file, 'r') as f:
             model_input = yaml.safe_load(f)
@@ -38,7 +38,7 @@ class Model(object):
             model_input, 
             self.datetime_0, 
             self.init_t_max, 
-            plotfile=rpu_image_file,
+            plotfile="scheduling/"+rpu_image_file,
             show_utilization_plot=False
             )
         self.task_resource_options = read_task_input(model_input['resources'])
@@ -205,7 +205,7 @@ class Model(object):
         print(self.collect_results() , file=repfile)
         print(self.project_report() , file=repfile)
         print("## Optimal Timetable" , file=repfile)
-        timetable_file = "scheduling/{}_timetable.png".format(self.name)
+        timetable_file = "{}_timetable.png".format(self.name)
         print("![Timetable]({})\n\n\n".format(timetable_file) , file=repfile)
         repfile.close()
 
