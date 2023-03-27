@@ -1,13 +1,21 @@
+resources_possibly_occupied_till: 20
+planning_horizon_days: 90
 resources:
     Generative:
         member: ["G1","G2","G3","G4","G5"]
         task: ["Design_Exp","Soln_Pass_A","Eval_Pass_A","Soln_Pass_B","Eval_Pass_B","Soln_Pass_C","Eval_Pass_C"]
+        state0: [3,3,3,3,3,3,1,1,1,1,1,1]
+        # state at time 0, format [units_busy_at_time_0, units_busy_at_time_1, units_busy_at_time_2, ...]
     Planner:
         member: ["P1","P2"]
         task: ["Plan_Project","Design_Exp","Documentation_to_Client"]
+        busy_units: [[0,4],[1,2],[10,12]]
+        # list of busy times by unit, format: [(unit_busy_start, unit_busy_end),...]
     Clinical:
         member: ["C1","C2","C3"]
         task: ["Clinical_Study_Design","Clinical_Study_Execution","Clinical_Study_Report"]
+        state0: [3,3,3,3,3,1,1,1,1,2,2,2,2,2,2,2,2,2]
+        # state at time 0, format [units_busy_at_time_0, units_busy_at_time_1, units_busy_at_time_2, ...]
 project_type:
     full_length:
      - Plan_Project
@@ -58,13 +66,13 @@ projects:
         durations: [2,2,8,1,4,1,1,6,3]
         deadline: 45
         delay_penalty: 2
-        early_bonus: 0
+        early_bonus: 0.5
     short:
         type: quick_analysis
         durations: [2,2,12,1,1,8,1]
         deadline: 50
         delay_penalty: 2
-        early_bonus: 0
+        early_bonus: 0.1
 resource_occupied:
 # [(start, end, units_occupied), (...)]
     Clinical: [[0,6,3],[6,12,1]]
