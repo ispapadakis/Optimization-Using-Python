@@ -60,3 +60,8 @@
 
 
 
+## Optimal Resource Utilization
+![Utilization](scheduling_RD_utilization.png)
+
+
+

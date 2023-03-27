@@ -1,3 +1,4 @@
 .ipynb_checkpoints/SimpleJobShopScheduling-checkpoint.ipynb
 __pycache__/scheduling_utils.cpython-310.pyc
 .ipynb_checkpoints/Scheduling_RD_Teams-checkpoint.ipynb
+*.xls
