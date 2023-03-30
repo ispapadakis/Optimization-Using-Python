@@ -17,7 +17,7 @@ def plot_utilization(resource_reqs: dict, datetime_0: datetime, tmax: int):
         ax[j].step(x, y, where="post");
         ax[j].fill_between(x, y, step="post", alpha=0.4)
         ax[j].grid()
-        ax[j].set_title("Utilization of {}".format(resource))
+        ax[j].set_title("Prior Engagement of {}".format(resource))
     return fig
 
 # Display Project Tasks

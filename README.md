@@ -8,3 +8,5 @@
   |  Example Output |
   |  -------------- |
   |  <img src="jobshopexample.png" width="700"> |
+
+-[One Period Planner for R&D Project Scheduling (Constraint Programming)](scheduling/scheduling_RD_report.md)
