@@ -1,12 +1,23 @@
 # Optimization-Using-Python
 
-- [Early Work: Implementation of Optimization Model Using Python/Pulp](CredLimOptimization.py)
+## Early Work Using Open Source Solutions
 
-- [Early Work: Example of Nonlinear Optimization Using scipy.optimize](NonlinearProgrammingUsingPython.ipynb)
+- scipy.optimize is not the best option for problems larger than toy-size
 
-- [Job Shop Scheduling Using Constraint Programming  With Google ortools](SimpleJobShopScheduling.ipynb)
-  |  Example Output |
-  |  -------------- |
-  |  <img src="jobshopexample.png" width="700"> |
+See an example here: [Example of Nonlinear Optimization Using scipy.optimize](NonlinearProgrammingUsingPython.ipynb)
 
--[One Period Planner for R&D Project Scheduling (Constraint Programming)](scheduling/scheduling_RD_report.md)
+- The following Python packages are open source and do the job:
+  - [Pulp](https://coin-or.github.io/pulp/) - See toy example: [Optimization Using Python/Pulp](CredLimOptimization.py)
+  - [Python-MIP](https://www.python-mip.com/) - Find Many Examples in Docs
+
+## Constraint Programming
+
+[Google OR-Tools](https://pypi.org/project/ortools/) is an impressive open-source application, lacking developer support though.
+
+Of particular interest is the cpModel solver for Contraint Programming. See examples below:
+
+- [Job Shop Scheduling (Constraint Programming)](SimpleJobShopScheduling.ipynb)
+
+- [One Period Planner for R&D Project Scheduling (Constraint Programming)](scheduling/scheduling_RD_report.md)
+  - Leverages AddCumulative constraint
+  - Some tasks may be completed by multiple resources. Which resource is best of these tasks is chosen by the optimization model.
