@@ -20,4 +20,4 @@ Of particular interest is the cpModel solver for Contraint Programming. See exam
 
 - [One Period Planner for R&D Project Scheduling (Constraint Programming)](scheduling/scheduling_RD_report.md)
   - Leverages AddCumulative constraint
-  - Some tasks may be completed by multiple resources. Which resource is best of these tasks is chosen by the optimization model.
+  - Some tasks may be completed by multiple resources. Which resources are best of these tasks is chosen by the optimization model.
