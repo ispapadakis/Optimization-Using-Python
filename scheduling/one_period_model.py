@@ -145,9 +145,7 @@ class Model(object):
         # Set Processing Time Limit
         self.solver.parameters.max_time_in_seconds = max_time
         self.status = self.solver.Solve(self.model)
-        print(self.solver.StatusName())
-        print(self.solver.SolutionInfo())
-        print("Solver Wall Time {:,.4f} secs".format(self.solver.WallTime()))
+        print(self.solver.ResponseStats())
 
     def collect_results(self):
         out = "\n"*3
