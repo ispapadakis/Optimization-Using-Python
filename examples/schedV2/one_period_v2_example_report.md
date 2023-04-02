@@ -74,9 +74,6 @@
 | Generative |          5 |            700 |
 | Clinical   |          3 |            800 |
 
-### Resources Busy at Time 0
-
-![Utilization At Time 0](one_period_v2_example_state0.png)
 # Optimization Results
 
 
@@ -96,8 +93,12 @@
 | regsize    |         34 |     11 |      0 |
 | short      |         41 |      9 |      0 |
 
+
+
 ## Optimal Timetable
 ![Timetable](one_period_v2_example_timetable.png)
+
+
 
 
 

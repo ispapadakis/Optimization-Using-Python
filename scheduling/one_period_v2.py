@@ -1,9 +1,7 @@
 from ortools.sat.python import cp_model
-from utils import read_resource_input, read_task_input, read_project_input
 import yaml
 from datetime import datetime, timedelta
 from collections import namedtuple
-import sys
 import plotly.express as px
 import plotly.io as pio
 import matplotlib.pyplot as plt
@@ -47,12 +45,6 @@ class Model(object):
         self.project_reqs.reset_index().to_markdown(repfile, index=False)        
         print("\n\n### Resource Attributes\n", file=repfile)
         self.resource_attrs.to_markdown(repfile)
-        print("\n\n### Resources Busy at Time 0\n", file=repfile)
-        self.resource_busy.plot.bar(width=1,subplots=True, figsize=(10,7), sharex=True)
-        state0fig = self.name + "_state0.png"
-        plt.savefig(self.report_path.format(state0fig))
-        plt.close()
-        print("![Utilization At Time 0]({})".format(state0fig), file=repfile)
         # Set Parameters
         self.datetime_0 = datetime.strptime(model_input["date0_str"], "%Y-%m-%d").date()
         self.get_date = lambda d: self.datetime_0 + timedelta(days=d)
@@ -73,7 +65,7 @@ class Model(object):
         self.task_times = {}
         self.assign = {}
         self.resource_needs = {resource:[] for resource in self.resources}
-        self.chooce_resource = {}
+        self.resource_choice = {}
 
         for (project, task), pdata in self.project_reqs.groupby(["Project","Task"], sort=False):
             task_label = "{}_{}_".format(project,task)
@@ -90,7 +82,7 @@ class Model(object):
                     dv_interval = self.model.NewOptionalIntervalVar(
                             dv_start, duration, dv_end, dv_select, resource_label + "interval"
                             )
-                    self.chooce_resource.setdefault((project,task),[]).append(dv_select)
+                    self.resource_choice.setdefault((project,task),[]).append(dv_select)
                 else:
                     dv_select = None
                     dv_interval = self.model.NewIntervalVar(dv_start, duration, dv_end, resource_label + "_interval")
@@ -116,7 +108,7 @@ class Model(object):
 
     def set_resource_constraints(self):
         # Enforce One Resource Per Task
-        for _, idlist in self.chooce_resource.items():
+        for _, idlist in self.resource_choice.items():
             self.model.AddBoolXOr(*idlist)
         # Disjunctive Constraint: Enforce Resource Capacity Limit Over All Intervals
         for resource in self.resources:
@@ -240,13 +232,13 @@ class Model(object):
     
     def report_results(self):
         repfile = open(self.report_file, "a")
-        print("# Optimization Results", file=repfile)
+        print("\n\n# Optimization Results", file=repfile)
         print(self.collect_results() , file=repfile)
         print(self.project_report() , file=repfile)
-        print("## Optimal Timetable" , file=repfile)
+        print("\n\n## Optimal Timetable" , file=repfile)
         timetable_file = "{}_timetable.png".format(self.name)
         print("![Timetable]({})\n\n\n".format(timetable_file) , file=repfile)
-        print("## Optimal Resource Utilization" , file=repfile)
+        print("\n\n## Optimal Resource Utilization" , file=repfile)
         utilization_file = "{}_utilization.png".format(self.name)
         fig = self.resource_report()
         fig.savefig(self.report_path.format(utilization_file), dpi=72)
