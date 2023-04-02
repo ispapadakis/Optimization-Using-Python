@@ -26,7 +26,7 @@ import pulp as mp
 # cum_wodiff_mr Cumulative Reduction in Exp Writeoff Amount After Manual Review (Sums Segments with Lower Limit)
 # cum_expneed   Cumulative Expected Credit Need Given Credit Limit (Sums Segments with Lower Limit)
 # over_exprev   Cumulative Expected Revenue from Segment (Sums Segments with Lower Limit)
-with open("clo_pulp_data.csv") as f:
+with open("examples/clo/clo_pulp_data.csv") as f:
     # Load Title Line
     ttl = f.readline().rstrip().split(',')
     varType = [str,str,float,int,float,float,float,float,int,float,float,float,float]
@@ -62,7 +62,7 @@ for k in rawData:
 # wor       Writeoff Ratio
 # rvr       Revenue Ratio
 # mrwor     Writeoff Ratio if Reviewd Manually
-with open("clo_pulp_pars.csv") as f:
+with open("examples/clo/clo_pulp_pars.csv") as f:
     # Load Title Line
     paramNames = f.readline().rstrip().split(',')
     paramData = dict()
@@ -144,7 +144,7 @@ prob += sum([modelData[case]['cum_wotot'] * x[case] - modelData[case]['cum_wodif
 
     
 # The problem data is written to an .lp file
-prob.writeLP("clo_pulp.lp")
+prob.writeLP("scheduling/clo_pulp.lp")
 
 # The problem is solved using PuLP's choice of Solver
 prob.solve()

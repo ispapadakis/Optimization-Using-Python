@@ -1,0 +1,6 @@
+project_attrs: "examples/schedV2/project_attrs.csv"
+project_reqs: "examples/schedV2/project_reqs.csv"
+resource_attrs: "examples/schedV2/resource_attrs.csv"
+resource_busy: "examples/schedV2/resource_busy.csv"
+report_path: "examples/schedV2/{}"
+date0_str: "2023-05-01"

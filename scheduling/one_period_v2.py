@@ -1,9 +1,7 @@
 from ortools.sat.python import cp_model
-from utils import read_resource_input, read_task_input, read_project_input
 import yaml
 from datetime import datetime, timedelta
 from collections import namedtuple
-import sys
 import plotly.express as px
 import plotly.io as pio
 import matplotlib.pyplot as plt
@@ -21,86 +19,83 @@ class Model(object):
     def __init__(self, name: str) -> None:
         self.name = name
         self.model = cp_model.CpModel()
-        self.report_file = "scheduling/{}_report.md".format(name)
 
-    def get_inputs(self, model_input_file: str, date0_str: str):
-        rpu_image_file = "{}_resource_prior_utilization.png".format(self.name)
+    def get_inputs(self):
         # Import Model Inputs
-        with open(model_input_file, 'r') as f:
+        with open("scheduling/{}.yml".format(self.name), 'r') as f:
             model_input = yaml.safe_load(f)
 
+        self.project_attrs = pd.read_csv(model_input['project_attrs'], index_col=[0])
+        self.projects = self.project_attrs.index.to_list()
+        self.project_reqs = pd.read_csv(model_input['project_reqs'], index_col=[0,1,2])
+        self.resource_attrs = pd.read_csv(model_input['resource_attrs'], index_col=[0])
+        self.resource_busy = pd.read_csv(model_input['resource_busy'], index_col=[0])
+        self.task_choice = self.project_reqs.groupby(['Project','Task']).size()
+        self.resources = self.resource_attrs.index.to_list()
+        # Upper Limit for Project Completion
+        self.horizon = self.project_reqs["Duration"].sum() + len(self.resource_busy)
+        self.report_path = model_input["report_path"]
+
+        self.report_file = self.report_path.format(self.name+"_report.md")
         repfile = open(self.report_file, "w")
         print("## Model Inputs", file=repfile)
+        print("\n\n### Project Attributes\n", file=repfile)
+        self.project_attrs.to_markdown(repfile)
+        print("\n\n### Project Requirements\n", file=repfile)
+        self.project_reqs.reset_index().to_markdown(repfile, index=False)        
+        print("\n\n### Resource Attributes\n", file=repfile)
+        self.resource_attrs.to_markdown(repfile)
         # Set Parameters
-        self.datetime_0 = datetime.strptime(date0_str, "%Y-%m-%d").date()
+        self.datetime_0 = datetime.strptime(model_input["date0_str"], "%Y-%m-%d").date()
         self.get_date = lambda d: self.datetime_0 + timedelta(days=d)
-        self.init_t_max = model_input['resources_possibly_occupied_till']
-        self.horizon = model_input['planning_horizon_days']
-        self.resources = read_resource_input(
-            model_input, 
-            self.datetime_0, 
-            self.init_t_max, 
-            plotfile="scheduling/"+rpu_image_file,
-            show_utilization_plot=False
-            )
-        self.task_resource_options = read_task_input(model_input['resources'])
-        self.projects = read_project_input(
-            model_input['projects'], 
-            model_input['project_type'],
-            display_summary=True, 
-            display_priorities=True,
-            file=repfile
-            )
-        
-        print("\n"*3, file=repfile)
-        print("### Resource Utilization At Time 0", file=repfile)
-        print("![Resource Prior Utilization]({})".format(rpu_image_file), file=repfile)
         repfile.close()
 
     def set_model_variables(self):
-        self.assign = {}
-        self.task_times = {}
-        self.resource_needs = {resource:[] for resource in self.resources}
-        self.resolve_multiple_res = {}
-        self.project_completion = {}
 
-        # Collect New Variables for Task: Start, End, Interval, Select if Optional
-        # Collect New Variables for Resource Needs
-        for pname, proj in self.projects.items():
-            self.assign[pname] = []
-            self.task_times[pname] = []
+        # Project Earliness and Tardiness
+        self.project_completion = {}
+        for pname in self.projects:
             self.project_completion[pname] = CompletionWin(
                 self.model.NewIntVar(0, self.horizon, "{}_earliness".format(pname)),
                 self.model.NewIntVar(0, self.horizon, "{}_tardiness".format(pname))
                 )
-            for task, duration in proj.task_sequence:
-                prefix = "{}_{}_".format(pname,task)
-                dv_start = self.model.NewIntVar(0, self.horizon, prefix + 'start')
-                dv_end = self.model.NewIntVar(0, self.horizon, prefix + 'end')
-                self.task_times[pname].append(TaskWin(dv_start, dv_end))
-                is_one_resource_task = (len(self.task_resource_options[task]) == 1)
-                for resource in self.task_resource_options[task]:
-                    if is_one_resource_task:
-                        dv_select = None
-                        dv_interval = self.model.NewIntervalVar(dv_start, duration, dv_end, "{}{}_interval".format(prefix, resource))
-                    else:
-                        dv_select = self.model.NewBoolVar("{}{}_indicator".format(prefix, resource))
-                        dv_interval = self.model.NewOptionalIntervalVar(
-                            dv_start, duration, dv_end, dv_select, "{}{}_opt_interval".format(prefix, resource)
+            
+        # Collect New Variables for Task: Start, End, Interval, Select if Optional
+        # Collect New Variables for Resource Needs
+        self.task_times = {}
+        self.assign = {}
+        self.resource_needs = {resource:[] for resource in self.resources}
+        self.resource_choice = {}
+
+        for (project, task), pdata in self.project_reqs.groupby(["Project","Task"], sort=False):
+            task_label = "{}_{}_".format(project,task)
+            dv_start = self.model.NewIntVar(0, self.horizon, task_label + 'start')
+            dv_end = self.model.NewIntVar(0, self.horizon, task_label + 'end')
+            self.task_times.setdefault(project, []).append(TaskWin(dv_start, dv_end))
+            has_multiple_options = (len(pdata) > 1)
+            for resource in pdata.index.get_level_values("Resource"):
+                resource_label = "{}_{}_{}_".format(project, task, resource)
+                duration = self.project_reqs.loc[(project,task,resource),"Duration"]
+                units = self.project_reqs.loc[(project,task,resource),"Units"]
+                if has_multiple_options:
+                    dv_select = self.model.NewBoolVar(resource_label + "indicator")
+                    dv_interval = self.model.NewOptionalIntervalVar(
+                            dv_start, duration, dv_end, dv_select, resource_label + "interval"
                             )
-                        self.resolve_multiple_res.setdefault((pname,task),[]).append(dv_select)
-                    self.assign[pname].append(
-                        Task(task, resource, self.resource_units_per_task, dv_interval, dv_select)
-                    )
-                    self.resource_needs[resource].append((dv_interval, self.resource_units_per_task))
+                    self.resource_choice.setdefault((project,task),[]).append(dv_select)
+                else:
+                    dv_select = None
+                    dv_interval = self.model.NewIntervalVar(dv_start, duration, dv_end, resource_label + "_interval")
+                self.assign.setdefault(project, []).append(Task(task, resource, units, dv_interval, dv_select))
+                self.resource_needs.setdefault(resource, []).append((dv_interval, units))
 
         # Account for Additional Needs Due to Initial Commitment
-        for res in self.resources.values():
-            for t, demand in enumerate(res.state0):
+        for resource in self.resources:
+            for t, demand in enumerate(self.resource_busy[resource].values):
                 task = "t{:2d}".format(t)
-                ivname = "occupied_{}_{}_interval".format(t,res.name)
+                ivname = "occupied_{}_{}_interval".format(t,resource)
                 if demand > 0:
-                    self.resource_needs.setdefault(res.name,[]).append((self.model.NewIntervalVar(t, 1, t+1, ivname), demand))
+                    self.resource_needs.setdefault(resource,[]).append((self.model.NewIntervalVar(t, 1, t+1, ivname), demand))
 
     def get_project_endtime(self, projname):
         return self.task_times[projname][-1].end
@@ -113,25 +108,40 @@ class Model(object):
 
     def set_resource_constraints(self):
         # Enforce One Resource Per Task
-        for _, idlist in self.resolve_multiple_res.items():
+        for _, idlist in self.resource_choice.items():
             self.model.AddBoolXOr(*idlist)
         # Disjunctive Constraint: Enforce Resource Capacity Limit Over All Intervals
-        for res in self.resources.values():
-            intervals, utilization = zip(*self.resource_needs[res.name])
-            self.model.AddCumulative(intervals, utilization, res.capacity)
+        for resource in self.resources:
+            intervals, utilization = zip(*self.resource_needs[resource])
+            self.model.AddCumulative(
+                intervals, 
+                utilization, 
+                self.resource_attrs.loc[resource, "Capacity"]
+                )
 
     def set_objective(self):
         # Deadline Contraints
-        for pname, proj in self.projects.items():
-            earliness, tardiness = self.project_completion[pname]
-            self.model.Add(proj.deadline + tardiness - earliness == self.get_project_endtime(pname))
-        # Objective: Optimize Penalty / Bonus
+        for project in self.projects:
+            deadline = self.project_attrs.loc[project,"Deadline"]
+            earliness, tardiness = self.project_completion[project]
+            self.model.Add(deadline + tardiness - earliness == self.get_project_endtime(project))
+        # Objective: Minimize Resource Cost + Delay Penalty - Early Bonus
+        resource_cost = []
+        for project in self.projects:
+            for tstruct in self.assign[project]:
+                cpd = self.resource_attrs.loc[tstruct.resource, "Cost per Day"]
+                duration = tstruct.interval.SizeExpr()
+                cost_per_task = cpd * tstruct.units * duration
+                resource_cost.append(cost_per_task if tstruct.is_active is None else cost_per_task * tstruct.is_active)
+                
         self.model.Minimize(
+            sum(resource_cost) +
             sum(
-                proj.delay_penalty * self.project_completion[pname].tardy 
-                - proj.early_bonus * self.project_completion[pname].early
-                for pname, proj in self.projects.items()
-            ))
+                pdata["Delay Penalty"] * self.project_completion[project].tardy 
+                - pdata["Early Bonus"] * self.project_completion[project].early
+                for project, pdata in self.project_attrs.iterrows()
+                )
+            )
 
     def build_model(self):
         self.set_model_variables()
@@ -175,7 +185,8 @@ class Model(object):
                 color_discrete_sequence=px.colors.qualitative.Light24
             )
             fig.update_yaxes(categoryorder="category descending")
-            pio.write_image(fig, "scheduling/{}_timetable.png".format(self.name), width=1080, height=720)
+            filename = self.report_path.format("{}_timetable.png".format(self.name))
+            pio.write_image(fig, filename, width=1080, height=720)
 
             out += '\t- Optimal Objective Value: {:,.3f}\n'.format(self.solver.ObjectiveValue())
             out += '\t- Optimal Objective Bound: {:,.3f}\n'.format(self.solver.BestObjectiveBound())
@@ -202,14 +213,14 @@ class Model(object):
         cols = [(resource, s) for resource in self.resources for s in ['state0','state1']]
         utilization = pd.DataFrame(0, index=np.arange(self.makespan+1), columns=pd.MultiIndex.from_tuples(cols))
         utilization.columns.names = ['Resource','State']
-        for res in self.resources.values():
-            for i, x in enumerate(res.state0):
-                utilization.loc[i,(res.name,'state0')] += x
-            for iv, units in self.resource_needs[res.name]:
+        for resource in self.resources:
+            for i, x in enumerate(self.resource_busy[resource].values):
+                utilization.loc[i,(resource,'state0')] += x
+            for iv, units in self.resource_needs[resource]:
                 start = self.solver.Value(iv.StartExpr())
                 end = self.solver.Value(iv.EndExpr())
                 for i in range(start,end):
-                    utilization.loc[i,(res.name,'state1')] += units
+                    utilization.loc[i,(resource,'state1')] += units
         color_dict = {'state0':'grey', 'state1':'green'}
         utilization.index = [self.get_date(t).strftime("%b %d") for t in utilization.index]
         fig, axs = plt.subplots(len(self.resources), 1, figsize=(8,12), sharex=True)
@@ -221,24 +232,23 @@ class Model(object):
     
     def report_results(self):
         repfile = open(self.report_file, "a")
-        print("# Optimization Results", file=repfile)
+        print("\n\n# Optimization Results", file=repfile)
         print(self.collect_results() , file=repfile)
         print(self.project_report() , file=repfile)
-        print("## Optimal Timetable" , file=repfile)
+        print("\n\n## Optimal Timetable" , file=repfile)
         timetable_file = "{}_timetable.png".format(self.name)
         print("![Timetable]({})\n\n\n".format(timetable_file) , file=repfile)
-        print("## Optimal Resource Utilization" , file=repfile)
+        print("\n\n## Optimal Resource Utilization" , file=repfile)
         utilization_file = "{}_utilization.png".format(self.name)
         fig = self.resource_report()
-        fig.savefig("scheduling/{}".format(utilization_file), dpi=72)
+        fig.savefig(self.report_path.format(utilization_file), dpi=72)
         print("![Utilization]({})\n\n\n".format(utilization_file) , file=repfile)
         repfile.close()
 
 
 if __name__ == "__main__":
-    mod = Model('scheduling_RD')
-    mod.get_inputs(model_input_file='scheduling/RD_Teams_Inputs.yml', date0_str="2023-04-01")
+    mod = Model('one_period_v2_example')
+    mod.get_inputs()
     mod.build_model()
     mod.solve()
     mod.report_results()
-
