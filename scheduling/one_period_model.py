@@ -34,7 +34,6 @@ class Model(object):
         # Set Parameters
         self.datetime_0 = datetime.strptime(date0_str, "%Y-%m-%d").date()
         self.get_date = lambda d: self.datetime_0 + timedelta(days=d)
-        self.horizon = model_input['planning_horizon_days']
         self.init_t_max = model_input['resources_possibly_occupied_till']
         self.horizon = model_input['planning_horizon_days']
         self.resources = read_resource_input(
