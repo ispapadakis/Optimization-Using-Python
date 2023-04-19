@@ -14,8 +14,6 @@ Task = namedtuple('Task','name resource units interval is_active')
 
 class Model(object):
 
-    resource_units_per_task = 1
-
     def __init__(self, name: str) -> None:
         self.name = name
         self.model = cp_model.CpModel()

@@ -21,7 +21,7 @@ class Model(object):
     def __init__(self, name: str) -> None:
         self.name = name
         self.model = cp_model.CpModel()
-        self.report_file = "scheduling/{}_report.md".format(name)
+        self.report_file = "examples/schedV1/{}_report.md".format(name)
 
     def get_inputs(self, model_input_file: str, date0_str: str):
         rpu_image_file = "{}_resource_prior_utilization.png".format(self.name)
@@ -40,7 +40,7 @@ class Model(object):
             model_input, 
             self.datetime_0, 
             self.init_t_max, 
-            plotfile="scheduling/"+rpu_image_file,
+            plotfile="examples/schedV1/"+rpu_image_file,
             show_utilization_plot=False
             )
         self.task_resource_options = read_task_input(model_input['resources'])
@@ -175,7 +175,7 @@ class Model(object):
                 color_discrete_sequence=px.colors.qualitative.Light24
             )
             fig.update_yaxes(categoryorder="category descending")
-            pio.write_image(fig, "scheduling/{}_timetable.png".format(self.name), width=1080, height=720)
+            pio.write_image(fig, "examples/schedV1/{}_timetable.png".format(self.name), width=1080, height=720)
 
             out += '\t- Optimal Objective Value: {:,.3f}\n'.format(self.solver.ObjectiveValue())
             out += '\t- Optimal Objective Bound: {:,.3f}\n'.format(self.solver.BestObjectiveBound())
@@ -221,7 +221,7 @@ class Model(object):
     
     def report_results(self):
         repfile = open(self.report_file, "a")
-        print("# Optimization Results", file=repfile)
+        print("\n# Optimization Results", file=repfile)
         print(self.collect_results() , file=repfile)
         print(self.project_report() , file=repfile)
         print("## Optimal Timetable" , file=repfile)
@@ -230,7 +230,7 @@ class Model(object):
         print("## Optimal Resource Utilization" , file=repfile)
         utilization_file = "{}_utilization.png".format(self.name)
         fig = self.resource_report()
-        fig.savefig("scheduling/{}".format(utilization_file), dpi=72)
+        fig.savefig("examples/schedV1/{}".format(utilization_file), dpi=72)
         print("![Utilization]({})\n\n\n".format(utilization_file) , file=repfile)
         repfile.close()
 

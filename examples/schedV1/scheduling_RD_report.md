@@ -36,6 +36,7 @@
 
 ### Resource Utilization At Time 0
 ![Resource Prior Utilization](scheduling_RD_resource_prior_utilization.png)
+
 # Optimization Results
 
 
