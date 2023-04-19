@@ -1,0 +1,14 @@
+project_attrs: "examples/schedV2/project_attrs.csv"
+project_reqs: "examples/schedV2/project_reqs.csv"
+resource_attrs: "examples/schedV2/resource_attrs.csv"
+resource_busy: "examples/schedV2/resource_busy.csv"
+report_path: "examples/schedV2/{}"
+date0_str: "2023-05-01"
+stoch_task:
+  bypass:
+    - ['regsize','T05_Soln_Pass_B']
+    - ['regsize','T06_Eval_Pass_B']
+  bypass_probability: 0.40
+  uncertainty_resolves_after: 
+    project: regsize
+    task: T04_Eval_Pass_A
