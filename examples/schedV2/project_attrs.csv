@@ -1,5 +1,5 @@
 ﻿Project,Deadline,Delay Penalty,Early Bonus
 longasap,33,4,1
 long,40,3,1
-regsize,45,2,0.5
-short,50,2,0.1
+regsize,38,2,0.5
+short,42,1,0.1

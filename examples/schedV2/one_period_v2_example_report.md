@@ -7,64 +7,64 @@
 |:----------|-----------:|----------------:|--------------:|
 | longasap  |         33 |               4 |           1   |
 | long      |         40 |               3 |           1   |
-| regsize   |         45 |               2 |           0.5 |
-| short     |         50 |               2 |           0.1 |
+| regsize   |         38 |               2 |           0.5 |
+| short     |         42 |               1 |           0.1 |
 
 ### Project Requirements
 
-| Project   | Task                     | Resource   |   Duration |   Units |
-|:----------|:-------------------------|:-----------|-----------:|--------:|
-| longasap  | Plan_Project             | Planner    |          2 |       1 |
-| longasap  | Design_Exp               | Generative |          2 |       2 |
-| longasap  | Design_Exp               | Planner    |          2 |       1 |
-| longasap  | Soln_Pass_A              | Generative |          8 |       1 |
-| longasap  | Eval_Pass_A              | Generative |          1 |       2 |
-| longasap  | Eval_Pass_A              | Planner    |          1 |       1 |
-| longasap  | Soln_Pass_B              | Generative |          4 |       1 |
-| longasap  | Eval_Pass_B              | Generative |          1 |       1 |
-| longasap  | Soln_Pass_C              | Generative |          3 |       1 |
-| longasap  | Eval_Pass_C              | Generative |          1 |       1 |
-| longasap  | Clinical_Study_Design    | Clinical   |          1 |       1 |
-| longasap  | Clinical_Study_Execution | Clinical   |          8 |       1 |
-| longasap  | Clinical_Study_Report    | Clinical   |          1 |       2 |
-| longasap  | Clinical_Study_Report    | Planner    |          1 |       1 |
-| longasap  | Documentation_to_Client  | Planner    |          3 |       1 |
-| long      | Plan_Project             | Planner    |          2 |       1 |
-| long      | Design_Exp               | Generative |          2 |       2 |
-| long      | Design_Exp               | Planner    |          2 |       1 |
-| long      | Soln_Pass_A              | Generative |          8 |       1 |
-| long      | Eval_Pass_A              | Generative |          1 |       2 |
-| long      | Eval_Pass_A              | Planner    |          1 |       1 |
-| long      | Soln_Pass_B              | Generative |          4 |       1 |
-| long      | Eval_Pass_B              | Generative |          1 |       1 |
-| long      | Soln_Pass_C              | Generative |          3 |       1 |
-| long      | Eval_Pass_C              | Generative |          1 |       1 |
-| long      | Clinical_Study_Design    | Clinical   |          1 |       1 |
-| long      | Clinical_Study_Execution | Clinical   |          8 |       1 |
-| long      | Clinical_Study_Report    | Clinical   |          1 |       2 |
-| long      | Clinical_Study_Report    | Planner    |          1 |       1 |
-| long      | Documentation_to_Client  | Planner    |          3 |       1 |
-| regsize   | Plan_Project             | Planner    |          2 |       1 |
-| regsize   | Design_Exp               | Generative |          2 |       2 |
-| regsize   | Design_Exp               | Planner    |          2 |       1 |
-| regsize   | Soln_Pass_A              | Generative |          8 |       1 |
-| regsize   | Eval_Pass_A              | Generative |          1 |       2 |
-| regsize   | Eval_Pass_A              | Planner    |          1 |       1 |
-| regsize   | Soln_Pass_B              | Generative |          4 |       1 |
-| regsize   | Eval_Pass_B              | Generative |          1 |       1 |
-| regsize   | Clinical_Study_Design    | Clinical   |          1 |       1 |
-| regsize   | Clinical_Study_Execution | Clinical   |          6 |       1 |
-| regsize   | Documentation_to_Client  | Planner    |          3 |       1 |
-| short     | Plan_Project             | Planner    |          2 |       1 |
-| short     | Design_Exp               | Generative |          2 |       1 |
-| short     | Design_Exp               | Planner    |          2 |       1 |
-| short     | Soln_Pass_A              | Generative |         12 |       1 |
-| short     | Eval_Pass_A              | Generative |          1 |       2 |
-| short     | Eval_Pass_A              | Planner    |          1 |       1 |
-| short     | Clinical_Study_Design    | Clinical   |          1 |       1 |
-| short     | Clinical_Study_Execution | Clinical   |          8 |       1 |
-| short     | Clinical_Study_Report    | Clinical   |          1 |       2 |
-| short     | Clinical_Study_Report    | Planner    |          1 |       1 |
+| Project   | Task                         | Resource   |   Duration |   Units |
+|:----------|:-----------------------------|:-----------|-----------:|--------:|
+| longasap  | T01_Plan_Project             | Planner    |          2 |       1 |
+| longasap  | T02_Design_Exp               | Generative |          2 |       2 |
+| longasap  | T02_Design_Exp               | Planner    |          2 |       1 |
+| longasap  | T03_Soln_Pass_A              | Generative |          8 |       1 |
+| longasap  | T04_Eval_Pass_A              | Generative |          1 |       2 |
+| longasap  | T04_Eval_Pass_A              | Planner    |          1 |       1 |
+| longasap  | T05_Soln_Pass_B              | Generative |          4 |       1 |
+| longasap  | T06_Eval_Pass_B              | Generative |          1 |       1 |
+| longasap  | T07_Soln_Pass_C              | Generative |          3 |       1 |
+| longasap  | T08_Eval_Pass_C              | Generative |          1 |       1 |
+| longasap  | T09_Clinical_Study_Design    | Clinical   |          1 |       1 |
+| longasap  | T10_Clinical_Study_Execution | Clinical   |          8 |       1 |
+| longasap  | T11_Clinical_Study_Report    | Clinical   |          1 |       2 |
+| longasap  | T11_Clinical_Study_Report    | Planner    |          1 |       1 |
+| longasap  | T12_Documentation_to_Client  | Planner    |          3 |       1 |
+| long      | T01_Plan_Project             | Planner    |          2 |       1 |
+| long      | T02_Design_Exp               | Generative |          2 |       2 |
+| long      | T02_Design_Exp               | Planner    |          2 |       1 |
+| long      | T03_Soln_Pass_A              | Generative |          8 |       1 |
+| long      | T04_Eval_Pass_A              | Generative |          1 |       2 |
+| long      | T04_Eval_Pass_A              | Planner    |          1 |       1 |
+| long      | T05_Soln_Pass_B              | Generative |          4 |       1 |
+| long      | T06_Eval_Pass_B              | Generative |          1 |       1 |
+| long      | T07_Soln_Pass_C              | Generative |          3 |       1 |
+| long      | T08_Eval_Pass_C              | Generative |          1 |       1 |
+| long      | T09_Clinical_Study_Design    | Clinical   |          1 |       1 |
+| long      | T10_Clinical_Study_Execution | Clinical   |          8 |       1 |
+| long      | T11_Clinical_Study_Report    | Clinical   |          1 |       2 |
+| long      | T11_Clinical_Study_Report    | Planner    |          1 |       1 |
+| long      | T12_Documentation_to_Client  | Planner    |          3 |       1 |
+| regsize   | T01_Plan_Project             | Planner    |          2 |       1 |
+| regsize   | T02_Design_Exp               | Generative |          2 |       2 |
+| regsize   | T02_Design_Exp               | Planner    |          2 |       1 |
+| regsize   | T03_Soln_Pass_A              | Generative |          8 |       3 |
+| regsize   | T04_Eval_Pass_A              | Generative |          1 |       2 |
+| regsize   | T04_Eval_Pass_A              | Planner    |          1 |       1 |
+| regsize   | T05_Soln_Pass_B              | Generative |          4 |       3 |
+| regsize   | T06_Eval_Pass_B              | Generative |          1 |       1 |
+| regsize   | T09_Clinical_Study_Design    | Clinical   |          1 |       1 |
+| regsize   | T10_Clinical_Study_Execution | Clinical   |          6 |       1 |
+| regsize   | T12_Documentation_to_Client  | Planner    |          3 |       1 |
+| short     | T01_Plan_Project             | Planner    |          2 |       1 |
+| short     | T02_Design_Exp               | Generative |          2 |       1 |
+| short     | T02_Design_Exp               | Planner    |          2 |       1 |
+| short     | T03_Soln_Pass_A              | Generative |         12 |       1 |
+| short     | T04_Eval_Pass_A              | Generative |          1 |       2 |
+| short     | T04_Eval_Pass_A              | Planner    |          1 |       1 |
+| short     | T09_Clinical_Study_Design    | Clinical   |          1 |       1 |
+| short     | T10_Clinical_Study_Execution | Clinical   |          8 |       1 |
+| short     | T11_Clinical_Study_Report    | Clinical   |          1 |       2 |
+| short     | T11_Clinical_Study_Report    | Planner    |          1 |       1 |
 
 ### Resource Attributes
 
@@ -79,8 +79,8 @@
 
 
 - Solution Status: OPTIMAL
-	- Optimal Objective Value: 99,908.600
-	- Optimal Objective Bound: 99,908.600
+	- Optimal Objective Value: 116,719.000
+	- Optimal Objective Bound: 116,719.000
 
 
 
@@ -89,9 +89,9 @@
 | Project    | Completion |  Early |  Tardy |
 | :------    | ---------: |  ----: |  ----: |
 | longasap   |         37 |      0 |      4 |
-| long       |         39 |      1 |      0 |
-| regsize    |         34 |     11 |      0 |
-| short      |         41 |      9 |      0 |
+| long       |         40 |      0 |      0 |
+| regsize    |         39 |      0 |      1 |
+| short      |         43 |      0 |      1 |
 
 
 
