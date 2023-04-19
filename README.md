@@ -17,10 +17,19 @@ Of particular interest is the cpModel solver for Contraint Programming found in 
 
 - [Job Shop Scheduling (Constraint Programming)](SimpleJobShopScheduling.ipynb)
 
-- [One Period Planner for R&D Project Scheduling (Constraint Programming)](examples/schedV2/one_period_v2_example_report.md)
+- [One Period Planner for R&D Project Scheduling](examples/schedV2/one_period_v2_example_report.md)
   - [Code](scheduling/one_period_v2.py)
   - Leverages AddCumulative Constraint to set Capacity Limit over Project Horizon.
-  - **Minimize**: Resource Cost + Tardiness Penalty - Early Completion Bonus
+  - **Minimizes**: Resource Cost + Tardiness Penalty - Early Completion Bonus
   - Resources May Compete for Tasks.
   - Expensive Resources Might Finish Tasks Earlier Than Inexpensive Ones.
-  - Input Data in .csv Format.
+  - Input Data In .csv Format for Larger Problems.
+
+- [Planner for R&D Project Scheduling With One Uncertain Task Completion Time](examples/schedV2/stoch_duration_example_V0_report.md)
+  - [Code](scheduling/stoch_duration_v0.py)
+  - Adds Stochastic Programming Constraints.
+  - Leverages AddCumulative Constraint to set Capacity Limit over Project Horizon.
+  - **Minimizes**: Resource Cost + Tardiness Penalty - Early Completion Bonus
+  - Resources May Compete for Tasks.
+  - Expensive Resources Might Finish Tasks Earlier Than Inexpensive Ones.
+  - Input Data In .csv Format for Larger Problems.

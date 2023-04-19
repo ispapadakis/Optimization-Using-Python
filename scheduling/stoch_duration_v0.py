@@ -50,6 +50,16 @@ class Model2P(object):
         self.project_reqs.reset_index().to_markdown(repfile, index=False)        
         print("\n\n### Resource Attributes\n", file=repfile)
         self.resource_attrs.to_markdown(repfile)
+        print("\n\n### Stochastic Attributes\n", file=repfile)
+        print("\nBypass Tasks:", file=repfile)
+        for tp in model_input["stoch_task"]['bypass']:
+            print(*tp, file=repfile)
+        print("\nGiven Info After End Of", file=repfile, end=" ")
+        print(model_input["stoch_task"]['uncertainty_resolves_after']['project'], file=repfile, end=" ")
+        print(model_input["stoch_task"]['uncertainty_resolves_after']['task'], file=repfile)
+        print("\nWith Probabilities\n", file=repfile)
+        for event, prob in self.prob.items():
+            print("Event {:>8} -> Prob {:.1%}".format(event, prob), file=repfile)
         # Set Parameters
         self.datetime_0 = datetime.strptime(model_input["date0_str"], "%Y-%m-%d").date()
         self.get_date = lambda d: self.datetime_0 + timedelta(days=d)
@@ -184,10 +194,6 @@ class Model2P(object):
         self.solver.parameters.max_time_in_seconds = max_time
         self.status = self.solver.Solve(self.model)
         print(self.solver.ResponseStats())
-        print(self.solver.Value(self.urt))
-        for bau_tstruct, bypass_tstruct in zip(self.task_times["BAU",'short'], self.task_times["BYPASS",'short']):
-            print(bau_tstruct.start, self.solver.Value(bau_tstruct.start), bypass_tstruct.start, self.solver.Value(bypass_tstruct.start))
-            print(bau_tstruct.end, self.solver.Value(bau_tstruct.end), bypass_tstruct.end, self.solver.Value(bypass_tstruct.end))
 
     def collect_results(self):
         out = "\n"*3
@@ -219,6 +225,11 @@ class Model2P(object):
                 color_discrete_sequence=px.colors.qualitative.Light24
             )
             fig.update_yaxes(categoryorder="category descending")
+            urt = self.get_date(self.solver.Value(self.urt))
+            fig.add_vline(x=urt, line_dash="dot", line_color="white")
+            fig.add_annotation(
+                dict(x=urt,y=-1.0,text="Uncertainty Resolution",xanchor='center',font=dict(size=15))
+                )
             filename = self.report_path.format("{}_timetable.png".format(self.name))
             pio.write_image(fig, filename, width=1080, height=720)
 
@@ -241,6 +252,10 @@ class Model2P(object):
             earliness, tardiness = self.project_completion[scenario, project]
             self.makespan[scenario] = max(self.makespan[scenario], proj_end)
             out += fmt.format(scenario, project, proj_end, self.solver.Value(earliness), self.solver.Value(tardiness))
+
+        out += "\n\n### Time Uncertainty Is Resolved\n\n"
+        out +=  str(self.get_date(self.solver.Value(self.urt)))
+        out +=  " (Or {} Days After Time 0)\n".format(self.solver.Value(self.urt))
         return out
     
     def resource_report(self):
@@ -262,11 +277,16 @@ class Model2P(object):
         utilization.index = [self.get_date(t).strftime("%b %d") for t in utilization.index]
         fig, axs = plt.subplots(len(self.resources), len(self.prob), figsize=(16,12), sharex=True)
         fig.autofmt_xdate(rotation=90)
+        urt = self.solver.Value(self.urt)
         for i, rname in enumerate(self.resources):
             for j, scenario in enumerate(self.prob.keys()):
                 utilization.loc[:,(scenario, rname,'state1')] -= utilization.loc[:,(scenario, rname,'state0')]
                 ttl = "{}_{}".format(scenario, rname)
                 utilization[scenario][rname].plot.bar(stacked=True, title=ttl, width=1, grid=True, color=color_dict, ax=axs[i,j])
+                yannot = utilization[scenario][rname].sum(1).max()
+                axs[i,j].axvline(urt, color='red', linestyle=':', lw=2)
+                axs[i,j].text(urt, yannot, "Uncertainty\nResolution", ha='center', va='top', 
+                              bbox=dict(facecolor='white',boxstyle='square',edgecolor='red',pad=0.2))
         return fig
     
     def report_results(self):
