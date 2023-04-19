@@ -123,6 +123,21 @@
 | Generative |          5 |            700 |
 | Clinical   |          3 |            800 |
 
+### Stochastic Attributes
+
+
+Bypass Tasks:
+regsize T05_Soln_Pass_B
+regsize T06_Eval_Pass_B
+
+Given Info After End Of regsize T04_Eval_Pass_A
+
+With Probabilities
+
+Event      BAU -> Prob 60.0%
+Event   BYPASS -> Prob 40.0%
+
+
 # Optimization Results
 
 
@@ -145,6 +160,11 @@
 | BYPASS     | long       |         39 |      1 |      0 |
 | BYPASS     | regsize    |         32 |      6 |      0 |
 | BYPASS     | short      |         43 |      0 |      1 |
+
+
+### Time Uncertainty Is Resolved
+
+2023-05-22 (Or 21 Days After Time 0)
 
 
 
