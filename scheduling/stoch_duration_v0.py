@@ -152,12 +152,13 @@ class Model2P(object):
                 self.model.Add(min_time <= self.urt).OnlyEnforceIf(precede)
                 self.model.Add(min_time > self.urt).OnlyEnforceIf(precede.Not())
                 self.model.Add(bau_tstruct.start == bypass_tstruct.start).OnlyEnforceIf(precede)
+                self.model.Add(bau_tstruct.end == bypass_tstruct.end).OnlyEnforceIf(precede)
 
     def set_objective(self):
         # Deadline Contraints
         for scenario, project in product(self.prob.keys(), self.projects):
             deadline = self.project_attrs.loc[project,"Deadline"]
-            earliness, tardiness = self.project_completion[(scenario, project)]
+            earliness, tardiness = self.project_completion[scenario, project]
             self.model.Add(deadline + tardiness - earliness == self.get_project_endtime(scenario, project))
         # Objective: Minimize Resource Cost + Delay Penalty - Early Bonus
         resource_cost = []
@@ -173,8 +174,8 @@ class Model2P(object):
             sum(resource_cost) +
             sum(
                 prob * (
-                    pdata["Delay Penalty"] * self.project_completion[(scenario, project)].tardy 
-                    - pdata["Early Bonus"] * self.project_completion[(scenario, project)].early
+                    pdata["Delay Penalty"] * self.project_completion[scenario, project].tardy 
+                    - pdata["Early Bonus"] * self.project_completion[scenario, project].early
                 )
                 for project, pdata in self.project_attrs.iterrows()
                 for scenario, prob in self.prob.items()
