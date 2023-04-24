@@ -25,11 +25,11 @@ Of particular interest is the cpModel solver for Contraint Programming found in 
   - Expensive Resources Might Finish Tasks Earlier Than Inexpensive Ones.
   - Input Data In .csv Format for Larger Problems.
 
-- [Planner for R&D Project Scheduling With One Uncertain Task Completion Time](examples/schedV2/stoch_duration_example_V0_report.md)
-  - [Code](scheduling/stoch_duration_v0.py)
+- [Planner for R&D Project Scheduling With One Uncertain Task Completion Time](examples/schedV3/stoch_duration_example_V1_report.md))
+  - [Code](scheduling/stoch_duration_v1.py)
   - Adds Stochastic Programming Constraints.
   - Leverages AddCumulative Constraint to set Capacity Limit over Project Horizon.
   - **Minimizes**: Resource Cost + Tardiness Penalty - Early Completion Bonus
-  - Resources May Compete for Tasks.
+  - Resources May Compete for Tasks and May Complete at Different Cadence
   - Expensive Resources Might Finish Tasks Earlier Than Inexpensive Ones.
-  - Input Data In .csv Format for Larger Problems.
+  - Develop Model Data Structure for Model Variables and Results.
