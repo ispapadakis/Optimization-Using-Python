@@ -35,7 +35,7 @@ regsize,T02_Design_Exp,Planner,2,1
 regsize,T03_Soln_Pass_A,Generative,8,3
 regsize,T04_Eval_Pass_A,Generative,1,2
 regsize,T04_Eval_Pass_A,Planner,1,1
-regsize,T05_Soln_Pass_B,Generative,4,3
+regsize,T05_Soln_Pass_B,Generative,5,2
 regsize,T06_Eval_Pass_B,Generative,1,1
 regsize,T09_Clinical_Study_Design,Clinical,1,1
 regsize,T10_Clinical_Study_Execution,Clinical,6,1
